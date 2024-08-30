@@ -1,20 +1,16 @@
 steps:
-  # Copy source code to a new directory
-  - name: 'gcr.io/cloud-builders/gcloud'
-    entrypoint: 'bash'
-    args:
-      - '-c'
-      - |
-        mkdir -p /workspace/app
-        cp -r . /workspace/app
-
   # Build the container image
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['build', '-t', 'gcr.io/$PROJECT_ID/api-boilerplate:$COMMIT_SHA', '-f', 'docker/api/Dockerfile', '/workspace/app']
+    args: [
+      'build',
+      '-t', 'gcr.io/$PROJECT_ID/api-boilerplate:$BUILD_ID',
+      '-f', 'docker/api/Dockerfile',
+      '.'
+    ]
 
   # Push the container image to Container Registry
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['push', 'gcr.io/$PROJECT_ID/api-boilerplate:$COMMIT_SHA']
+    args: ['push', 'gcr.io/$PROJECT_ID/api-boilerplate:$BUILD_ID']
 
   # Deploy container image to Cloud Run
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
@@ -24,7 +20,7 @@ steps:
       - 'deploy'
       - 'api-boilerplate'
       - '--image'
-      - 'gcr.io/$PROJECT_ID/api-boilerplate:$COMMIT_SHA'
+      - 'gcr.io/$PROJECT_ID/api-boilerplate:$BUILD_ID'
       - '--region'
       - 'asia-northeast1'
       - '--platform'
@@ -33,4 +29,4 @@ steps:
       - '1234'
 
 images:
-  - 'gcr.io/$PROJECT_ID/api-boilerplate:$COMMIT_SHA'
+  - 'gcr.io/$PROJECT_ID/api-boilerplate:$BUILD_ID'
