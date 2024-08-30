@@ -26,3 +26,4 @@ open_api_bundle:
 
 .PHONY: deploy
 deploy:
+	gcloud builds submit --config=cloudbuild.yaml
