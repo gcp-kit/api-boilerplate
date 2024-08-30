@@ -1,0 +1,36 @@
+steps:
+  # Copy source code to a new directory
+  - name: 'gcr.io/cloud-builders/gcloud'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        mkdir -p /workspace/app
+        cp -r . /workspace/app
+
+  # Build the container image
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['build', '-t', 'gcr.io/$PROJECT_ID/api-boilerplate:$COMMIT_SHA', '-f', 'docker/api/Dockerfile', '/workspace/app']
+
+  # Push the container image to Container Registry
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'gcr.io/$PROJECT_ID/api-boilerplate:$COMMIT_SHA']
+
+  # Deploy container image to Cloud Run
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: gcloud
+    args:
+      - 'run'
+      - 'deploy'
+      - 'api-boilerplate'
+      - '--image'
+      - 'gcr.io/$PROJECT_ID/api-boilerplate:$COMMIT_SHA'
+      - '--region'
+      - 'asia-northeast1'
+      - '--platform'
+      - 'managed'
+      - '--port'
+      - '1234'
+
+images:
+  - 'gcr.io/$PROJECT_ID/api-boilerplate:$COMMIT_SHA'

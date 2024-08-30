@@ -1,0 +1,8 @@
+package: openapi
+generate:
+  strict-server: true
+  echo-server: true
+  models: true
+output: app/general/internal/interfaces/openapi/openapi.go
+output-options:
+  skip-prune: true
